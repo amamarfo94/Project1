@@ -1,0 +1,181 @@
+/**************************************************************
+ *
+ * GROUP #
+ * Group Members:
+ * Date Completed:
+ * Filename: shoppingCart.cpp
+ * 
+ **************************************************************/
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <ctime>
+#include <sstream>
+#include <vector> 
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+/**************************************************************
+ *                             parse                          *
+ * Called by: <fill in>                                       *
+ * Passed   : 2 arguments: a string, a character that is the  *
+ *            delimiter                                       *
+ * Purpose  : Split a given string by its delimiter           *
+ * Returns  : String vector                                   *
+ **************************************************************/
+vector<string> parse(string line, char delimiter){
+    
+    vector<string> parsedLine;
+    istringstream stringStream( line ); //create string stream from the line
+    //iterate through the stream
+    while (stringStream)
+    {
+        string s;
+        //uses getline to get the values from the stream before the delimiting character
+        if (getline( stringStream, s, delimiter))
+          parsedLine.push_back(s);
+    }
+    return parsedLine;
+}
+
+vector<string> parseAddress(string line, char delimiter){
+    
+    vector<string> parsedLine;
+    istringstream stringStream( line ); //create string stream from the line
+    //iterate through the stream
+    while (stringStream)
+    {
+        string s;
+        //uses getline to get the values from the stream before the delimiting character
+        if (getline( stringStream, s, delimiter))
+          parsedLine.push_back(s);
+    }
+    return parsedLine;
+}
+
+/**************************************************************
+ *                  generateOrderNum                          *
+ * Called by: <fill in>                                       *                                       *
+ * Purpose  : Generate an order number based on epoch         *
+ * Returns  : String order number                             *
+ **************************************************************/
+string generateOrderNum(){
+    
+    time_t now = time(0); //current time object
+    
+    string oNum;
+    stringstream strstream;
+    
+    strstream << now; //read the date/time in epoch into the string stream
+    strstream >> oNum; //output a string from the string stream
+    return oNum;
+}
+
+struct Address { 
+    string streetAddress; 
+    string city; 
+    string state; 
+    string zipCode; 
+};
+
+struct Customer { 
+    string customerNum; 
+    string customerName; 
+    double lineOfCredit; 
+    Address * corporateAddress; 
+};
+
+vector<Customer> cust(0);
+
+int binarySearch(vector<Customer> v, int l, int r, string searchVal) 
+{ 
+    while (l <= r) { 
+        int m = l + (r - l) / 2; 
+  
+        // Check if searchVAl is equal to mid 
+        if (v[m].customerNum == searchVal) 
+            return m; 
+  
+        // If searchVal greater, ignore left half 
+        if (v[m].customerNum < searchVal) 
+            l = m + 1; 
+  
+        // If searchVal is smaller, ignore right half 
+        else
+            r = m - 1; 
+    } 
+  
+    // If the searchVal has not been found return -1
+    return -1; 
+} 
+
+int linearSearch(vector<Customer> v, string searchVal) 
+{ 
+    // Iterates through Customer vector
+    for (int i = 0; i < v.size(); i++) 
+        if (v[i].customerName == searchVal) 
+            return i;
+    
+    // If the searchVal has not been found return -1
+    return -1; 
+} 
+
+int main() {
+    
+    ifstream inf; // Opens file stream.
+    string fileName = "customers.dat"; // Filename.
+    inf.open(fileName.c_str()); // Opens file.
+    
+    vector<Customer> Records; // Stores all customers.
+    vector<Address> Addresses;
+    vector<string> TempCust;
+    vector<string> TempAddress;
+    string line;
+    Customer Temp;
+    Address Temp2;
+    int count = 0;
+    bool found = false;
+    
+    while (!(inf.eof())) {
+        
+        getline(inf, line);
+        TempCust = parse(line, '|');
+        TempAddress = parseAddress(TempCust[3], ',');
+            
+        Temp.customerNum = TempCust[0];
+        Temp.customerName = TempCust[1];
+        Temp.lineOfCredit = atof(TempCust[2].c_str());
+        
+        Temp2.streetAddress = TempAddress[0]; 
+        Temp2.city = TempAddress[1]; 
+        Temp2.state = TempAddress[2];
+        Temp2.zipCode = TempAddress[3];
+        
+        for (int i = 0; i < Addresses.size(); i++) {
+            if (Addresses[i].streetAddress == Temp2.streetAddress) {
+                found = true;
+                i = Addresses.size() + 1;
+            } 
+        }
+        
+        if (!(found)) {
+            Addresses.push_back(Temp2);
+        }
+                
+        Records.push_back(Temp);
+        
+        cout << Addresses[count].zipCode << endl;
+        cout << Records[count].customerName << endl;
+        count++;
+        found = false;
+    }
+    
+    
+    inf.close();
+    
+    return 0;
+ 
+}
